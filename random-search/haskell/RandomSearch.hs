@@ -28,38 +28,24 @@ sumOfSquares = sum . squares
 findBestMatching :: (Num n, Ord n) => (v -> n) -> [v] -> v
 findBestMatching score xs = maximumBy (\a b -> compare (score a) (score b)) xs
 
-randomList :: (Num n, Random n, RandomGen g) => Int -> g -> [n]
-randomList len g = take len $ randoms g
+randomList :: (Num n, Random n, RandomGen g) => g -> [n]
+randomList g = map fst $ tail $ iterate (\(x, g) -> random g) (0, g)
 
-randomLists :: (Num n, Random n, RandomGen g) => Int -> g -> [[n]]
-randomLists len g = map fst $ iterate (\(xs, g) -> randomListWithGen len g) ([], g)
+randomLists :: (Num n, Random n, RandomGen g) => g -> [[n]]
+randomLists g = map fst $ tail $ iterate (\(xs, g) -> let (ga, gb) = split g in (randomList ga, gb)) ([], g)
 
-randomListWithGen :: (Num n, Random n, RandomGen g) => Int -> g -> ([n], g)
-randomListWithGen len g = (take len $ xs, g')
-	where (xs, g') = mkRandomList [] g
-
-mkRandomList :: (Random n, RandomGen g) => [n] -> g -> ([n], g)
-mkRandomList xs g = (x:xs, g'')
-	where
-		(x, g') = random g
-		(xs, g'') = mkRandomList xs g'
-
--- iterate :: (a -> a) -> a -> [a]
-
---randomList :: (Num n, RandomGen g, Random n) => Int -> g -> ([n], g)
---randomList n g = do
---	(x, g') <- random g
---	(xs, g'') <- randomList (n-1) g'
---	return (x:xs, g'')
+randomListsOfLength :: (Num n, Random n, RandomGen g) => Int -> g -> [[n]]
+randomListsOfLength len g = map (take len) $ randomLists g
 
 main :: IO ()
 --main = putStrLn $ show 1
 --main = putStrLn $ show $ findBestMatching square [1,4,2,19,-1]
-main = do
-	putStrLn $ show $ take 2 $ (randomLists 10 (mkStdGen 1) :: [[Int]])
+main =
+	let lists = (randomListsOfLength 10 (mkStdGen 1) :: [[Int]])
+	in do
+		--putStrLn $ show $ take 10 $ lists
+		putStrLn $ show $ findBestMatching sumOfSquares (take 10 $ lists)
 	--putStrLn $ show $ (randomList 10 (mkStdGen 2) :: [Int])
-	putStrLn $ show $ findBestMatching square (randomList 10 (mkStdGen 1) :: [Int])
-	putStrLn $ show $ findBestMatching square (randomList 10 (mkStdGen 2) :: [Int])
 --main = putStrLn $ show $ randomSearch sumOfSquares (randomList 5) 1 (mkStdGen 1)
 
 --instance (Random a) => (Random [a]) where
