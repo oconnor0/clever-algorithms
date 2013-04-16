@@ -25,9 +25,6 @@ squares = map square
 sumOfSquares :: (Num a) => [a] -> a
 sumOfSquares = sum . squares
 
-findBestMatching :: (Num n, Ord n) => (v -> n) -> [v] -> v
-findBestMatching score xs = maximumBy (\a b -> compare (score a) (score b)) xs
-
 randomList :: (Num n, Random n, RandomGen g) => g -> [n]
 randomList g = map fst $ tail $ iterate (\(x, g) -> random g) (0, g)
 
@@ -37,21 +34,26 @@ randomLists g = map fst $ tail $ iterate (\(xs, g) -> let (ga, gb) = split g in 
 randomListsOfLength :: (Num n, Random n, RandomGen g) => Int -> g -> [[n]]
 randomListsOfLength len g = map (take len) $ randomLists g
 
+findBestMatching :: (Num n, Ord n) => (v -> n) -> [v] -> v
+findBestMatching score xs = maximumBy (\a b -> compare (score a) (score b)) xs
+
+randomSearch :: (Num n, Ord n) => (v -> n) -> Int -> [v] -> v
+randomSearch score n xs = findBestMatching score $ take n xs
+
 main :: IO ()
---main = putStrLn $ show 1
---main = putStrLn $ show $ findBestMatching square [1,4,2,19,-1]
 main =
 	let
 		lists = randomListsOfLength 10 (mkStdGen 1) :: [[Integer]]
 		best = findBestMatching sumOfSquares (take 10 $ lists)
 	in do
-		--putStrLn $ show $ take 10 $ lists
 		putStrLn $ show $ sort $ map sumOfSquares $ take 10 $ lists
 		putStrLn $ show $ sumOfSquares best
 		putStrLn $ show $ best
+		putStrLn $ show $ randomSearch sumOfSquares 10 lists
 	--putStrLn $ show $ (randomList 10 (mkStdGen 2) :: [Int])
 --main = putStrLn $ show $ randomSearch sumOfSquares (randomList 5) 1 (mkStdGen 1)
 
+-- attempt at implementing instance of Random for lists to simplify everything else
 --instance (Random a) => (Random [a]) where
 --	--randomR :: RandomGen g => ([a], [a]) -> g -> ([a], g)
 --	randomR bounds@(minB, maxB) gen = do
@@ -62,8 +64,3 @@ main =
 --	random gen = (random gen :: (a, g)) : (random gen :: ([a], g))
 
 --deriving instance (Random a) => (Random [a])
-
---randomSearch :: (Num n, Random v, RandomGen g) => (v -> n) -> Int -> g -> v
---randomSearch score n g = from
-
---class
