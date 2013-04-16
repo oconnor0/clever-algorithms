@@ -1,7 +1,10 @@
 {-# LANGUAGE StandaloneDeriving #-}
 
-import System.Random
+import Data.Function
 import Data.List
+import Data.Ord
+import GHC.Exts
+import System.Random
 
 {-	http://www.cleveralgorithms.com/nature-inspired/stochastic/random_search.html
 	Input: NumIterations, ProblemSize, SearchSpace
@@ -35,21 +38,21 @@ randomListsOfLength :: (Num n, Random n, RandomGen g) => Int -> g -> [[n]]
 randomListsOfLength len g = map (take len) $ randomLists g
 
 findBestMatching :: (Ord n) => (v -> n) -> [v] -> v
-findBestMatching score xs = maximumBy (\a b -> compare (score a) (score b)) xs
+findBestMatching score xs = maximumBy (\a b -> comparing score a b) xs
 
-randomSearch :: (Num n, Ord n) => (v -> n) -> Int -> [v] -> v
+randomSearch :: (Ord n) => (v -> n) -> Int -> [v] -> v
 randomSearch score n xs = findBestMatching score $ take n xs
 
 main :: IO ()
 main =
 	let
 		lists = randomListsOfLength 10 (mkStdGen 1) :: [[Integer]]
-		best = findBestMatching sumOfSquares (take 10 $ lists)
+		best = findBestMatching (Down . sumOfSquares) (take 10 $ lists)
 	in do
 		putStrLn $ show $ sort $ map sumOfSquares $ take 10 $ lists
 		putStrLn $ show $ sumOfSquares best
 		putStrLn $ show $ best
-		putStrLn $ show $ randomSearch sumOfSquares 10 lists
+		putStrLn $ show $ randomSearch (Down . sumOfSquares) 10 lists
 	--putStrLn $ show $ (randomList 10 (mkStdGen 2) :: [Int])
 
 -- attempt at implementing instance of Random for lists to simplify everything else
