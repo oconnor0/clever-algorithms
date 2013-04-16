@@ -28,11 +28,8 @@ squares = map square
 sumOfSquares :: (Num a) => [a] -> a
 sumOfSquares = sum . squares
 
-randomList :: (Num a, Random a, RandomGen g) => g -> [a]
-randomList g = map fst $ tail $ iterate (\(x, g) -> random g) (0, g)
-
 randomLists :: (Num a, Random a, RandomGen g) => g -> [[a]]
-randomLists g = map fst $ tail $ iterate (\(xs, g) -> let (ga, gb) = split g in (randomList ga, gb)) ([], g)
+randomLists g = map fst $ tail $ iterate (\(xs, g) -> let (ga, gb) = split g in (randoms ga, gb)) ([], g)
 
 randomListsOfLength :: (Num a, Random a, RandomGen g) => Int -> g -> [[a]]
 randomListsOfLength len g = map (take len) $ randomLists g
