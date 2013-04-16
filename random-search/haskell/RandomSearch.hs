@@ -41,10 +41,14 @@ main :: IO ()
 --main = putStrLn $ show 1
 --main = putStrLn $ show $ findBestMatching square [1,4,2,19,-1]
 main =
-	let lists = (randomListsOfLength 10 (mkStdGen 1) :: [[Int]])
+	let
+		lists = randomListsOfLength 10 (mkStdGen 1) :: [[Integer]]
+		best = findBestMatching sumOfSquares (take 10 $ lists)
 	in do
 		--putStrLn $ show $ take 10 $ lists
-		putStrLn $ show $ findBestMatching sumOfSquares (take 10 $ lists)
+		putStrLn $ show $ sort $ map sumOfSquares $ take 10 $ lists
+		putStrLn $ show $ sumOfSquares best
+		putStrLn $ show $ best
 	--putStrLn $ show $ (randomList 10 (mkStdGen 2) :: [Int])
 --main = putStrLn $ show $ randomSearch sumOfSquares (randomList 5) 1 (mkStdGen 1)
 
