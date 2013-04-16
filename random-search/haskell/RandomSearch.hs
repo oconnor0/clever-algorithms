@@ -34,7 +34,7 @@ randomLists g = map fst $ tail $ iterate (\(xs, g) -> let (ga, gb) = split g in 
 randomListsOfLength :: (Num n, Random n, RandomGen g) => Int -> g -> [[n]]
 randomListsOfLength len g = map (take len) $ randomLists g
 
-findBestMatching :: (Num n, Ord n) => (v -> n) -> [v] -> v
+findBestMatching :: (Ord n) => (v -> n) -> [v] -> v
 findBestMatching score xs = maximumBy (\a b -> compare (score a) (score b)) xs
 
 randomSearch :: (Num n, Ord n) => (v -> n) -> Int -> [v] -> v
@@ -51,7 +51,6 @@ main =
 		putStrLn $ show $ best
 		putStrLn $ show $ randomSearch sumOfSquares 10 lists
 	--putStrLn $ show $ (randomList 10 (mkStdGen 2) :: [Int])
---main = putStrLn $ show $ randomSearch sumOfSquares (randomList 5) 1 (mkStdGen 1)
 
 -- attempt at implementing instance of Random for lists to simplify everything else
 --instance (Random a) => (Random [a]) where
