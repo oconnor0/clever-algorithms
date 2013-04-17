@@ -35,25 +35,29 @@ randomListsBy :: (Num a, Random a, RandomGen g) => (g -> [a]) -> g -> [[a]]
 randomListsBy by g = map fst $ tail $ iterate (\(xs, g) -> let (ga, gb) = split g in (by ga, gb)) ([], g)
 
 randomListsOfLength :: (Num a, Random a, RandomGen g) => Int -> g -> [[a]]
-randomListsOfLength len g = map (take len) $ randomLists g
+--randomListsOfLength len g = map (take len) $ randomLists g
+randomListsOfLength len g = randomListsOfLengthBy len randoms g
+
+randomListsOfLengthBy :: (Num a, Random a, RandomGen g) => Int -> (g -> [a]) -> g -> [[a]]
+randomListsOfLengthBy len by g = map (take len) $ randomListsBy by g
 
 findBestMatching :: (Ord a) => (b -> a) -> [b] -> b
 findBestMatching score = maximumBy (comparing score)
 
-randomSearch :: (Ord a) => (b -> a) -> Int -> [b] -> b
-randomSearch score n xs = findBestMatching score $ take n xs
+search :: (Ord a) => (b -> a) -> [b] -> b
+search = findBestMatching
 
 main :: IO ()
 main =
 	let
 		--lists = randomListsOfLength 10 (mkStdGen 1) :: [[Integer]]
-		lists = randomListsOfLength 2 (mkStdGen 1) :: [[Float]]
-		best = findBestMatching (Down . sumOfSquares) (take 100 $ lists)
+		lists = randomListsOfLengthBy 2 (randomRs (-5,5)) $ mkStdGen 1 :: [[Float]]
+		best = findBestMatching (Down . sumOfSquares) (take 100 lists)
 	in do
-		putStrLn $ show $ sort $ map sumOfSquares $ take 100 $ lists
+		putStrLn $ show $ sort $ map sumOfSquares $ take 100 lists
 		putStrLn $ show $ sumOfSquares best
 		putStrLn $ show $ best
-		putStrLn $ show $ randomSearch (Down . sumOfSquares) 100 lists
+		putStrLn $ show $ search (Down . sumOfSquares) $ take 100 lists
 	--putStrLn $ show $ (randomList 10 (mkStdGen 2) :: [Int])
 
 -- attempt at implementing instance of Random for lists to simplify everything else
