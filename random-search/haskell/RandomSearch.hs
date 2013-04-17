@@ -1,5 +1,4 @@
-{-# LANGUAGE StandaloneDeriving #-}
-
+import Control.Monad
 import Data.Function
 import Data.List
 import Data.Ord
@@ -48,17 +47,14 @@ search :: (Ord a) => (b -> a) -> [b] -> b
 search = findBestMatching
 
 main :: IO ()
-main =
-	let
-		--lists = randomListsOfLength 10 (mkStdGen 1) :: [[Integer]]
-		lists = randomListsOfLengthBy 2 (randomRs (-5,5)) $ mkStdGen 1 :: [[Float]]
-		best = findBestMatching (Down . sumOfSquares) (take 100 lists)
-	in do
-		putStrLn $ show $ sort $ map sumOfSquares $ take 100 lists
-		putStrLn $ show $ sumOfSquares best
-		putStrLn $ show $ best
-		putStrLn $ show $ search (Down . sumOfSquares) $ take 100 lists
-	--putStrLn $ show $ (randomList 10 (mkStdGen 2) :: [Int])
+main = let samples = 100 in do
+	gen <- newStdGen
+	lists <- return $ randomListsOfLengthBy 2 (randomRs (-5.0::Float,5.0)) gen
+	best <- return $ findBestMatching (Down . sumOfSquares) (take samples lists)
+	putStr $ "out of " ++ (show samples) ++ " samples in search space, found mininum of "
+	putStr $ show $ sumOfSquares best
+	putStr " given "
+	putStrLn $ show best
 
 -- attempt at implementing instance of Random for lists to simplify everything else
 --instance (Random a) => (Random [a]) where
