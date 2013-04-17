@@ -51,7 +51,7 @@ main = let samples = 100 in do
 	gen <- newStdGen
 	lists <- return $ randomListsOfLengthBy 2 (randomRs (-5.0::Float,5.0)) gen
 	best <- return $ findBestMatching (Down . sumOfSquares) (take samples lists)
-	putStr $
+	putStrLn $
 		"out of " ++ (show samples) ++ " samples in search space, found mininum of "
 		++ (show $ sumOfSquares best) ++ " given " ++ (show best)
 
